@@ -1,10 +1,10 @@
 import { useState } from 'react';
-import { MessageSquare, ArrowRight, UserPlus, LogIn } from 'lucide-react';
-import { cn } from '../lib/utils';
-import axios from "axios";
-import { api_url } from '../config/api';
+import { MessageSquare, UserPlus, LogIn } from 'lucide-react';
+import { toast } from "react-toastify";
+import { useAuth } from '../hooks/useAuth';
 
-export default function Login({ onLogin }) {
+export default function Login() {
+    const { login, register, loading } = useAuth();
     const [isLoginMode, setIsLoginMode] = useState(true);
     const [name, setUsername] = useState('');
     const [email, setEmail] = useState('');
@@ -14,32 +14,33 @@ export default function Login({ onLogin }) {
         e.preventDefault();
         if (!name.trim() || !password.trim()) return;
         if (!isLoginMode && !email.trim()) return;
-        // const formdata = new FormData();
-        // formdata.append('name', name);
-        // formdata.append('email', email);
-        // formdata.append('password', password);
+
         try {
-            const res = await axios.post(api_url + '/auth/register',{name,email,password})
-            const user = await res.data;
-            console.log(user);
-
+            if (!isLoginMode) {
+                await register(name, email, password);
+                setIsLoginMode(true);
+            } else {
+                await login(name, password);
+            }
+            clearInput();
         } catch (error) {
-
+            toast.error(error.response?.data?.error || error.message || (isLoginMode ? 'Login failed' : 'Registration failed'));
         }
-        // onLogin(username.trim(), password.trim());
     };
 
-    const toggleMode = () => {
-        setIsLoginMode(!isLoginMode);
-        // Reset fields on mode switch
+    function clearInput (){
         setUsername('');
         setEmail('');
         setPassword('');
+    }
+    const toggleMode = () => {
+        setIsLoginMode(!isLoginMode);
+        clearInput();
     };
 
     return (
         <div className="flex min-h-screen items-center justify-center bg-background p-4 transition-colors duration-300">
-            <div className="w-full max-w-md overflow-hidden rounded-2xl dark:bg-muted shadow-xl transition-all duration-300 transform hover:scale-[1.01] border border-border bg-white dark:bg-muted">
+            <div className="w-full max-w-md overflow-hidden rounded-2xl shadow-xl transition-all duration-300 transform hover:scale-[1.01] border border-border bg-white dark:bg-muted">
                 <div className="p-8">
                     <div className="mb-8 flex flex-col items-center justify-center text-center">
                         <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 text-primary">

@@ -1,9 +1,12 @@
 import { useState, useEffect } from 'react';
-import Login from './components/Login';
 import Sidebar from './components/Sidebar';
 import ChatHeader from './components/ChatHeader';
 import MessageList from './components/MessageList';
 import MessageInput from './components/MessageInput';
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { useAuth } from './hooks/useAuth';
+import ProtectedRoute from './components/ProtectedRoute';
 
 const INITIAL_MESSAGES = {
   general: [
@@ -35,8 +38,8 @@ const INITIAL_MESSAGES = {
 };
 
 function App() {
-  const [username, setUsername] = useState('');
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const { user, logout, loading } = useAuth();
+  const username = user?.name ?? user?.email ?? 'User';
   const [currentRoom, setCurrentRoom] = useState('general');
   const [messages, setMessages] = useState(INITIAL_MESSAGES);
   const [isTyping, setIsTyping] = useState(false);
@@ -64,15 +67,6 @@ function App() {
     setTheme(prev => prev === 'light' ? 'dark' : 'light');
   };
 
-  const handleLogin = (name) => {
-    setUsername(name);
-    setIsLoggedIn(true);
-  };
-
-  const handleLogout = () => {
-    setIsLoggedIn(false);
-    setUsername('');
-  };
 
   const handleSendMessage = (text) => {
     const newMessage = {
@@ -115,42 +109,43 @@ function App() {
     // In a real app, this would emit a socket event
   };
 
-  if (!isLoggedIn) {
-    return <Login onLogin={handleLogin} />;
-  }
-
   const currentMessages = messages[currentRoom] || [];
 
   return (
-    <div className="flex h-screen w-full overflow-hidden bg-background text-foreground transition-colors duration-300">
-      {/* Sidebar - hidden on mobile, toggled via hamburger in a real app */}
-      <div className="hidden md:flex h-full">
-        <Sidebar
-          username={username}
-          currentRoom={currentRoom}
-          onRoomChange={setCurrentRoom}
-          onLogout={handleLogout}
-          theme={theme}
-          toggleTheme={toggleTheme}
-        />
-      </div>
+    <>
+        <ToastContainer position="top-right" autoClose={3000} theme={theme} />
+        <ProtectedRoute>
+            <div className="flex h-screen w-full overflow-hidden bg-background text-foreground transition-colors duration-300">
+                {/* Sidebar - hidden on mobile, toggled via hamburger in a real app */}
+                <div className="hidden md:flex h-full">
+                    <Sidebar
+                        username={username}
+                        currentRoom={currentRoom}
+                        onRoomChange={setCurrentRoom}
+                        onLogout={logout}
+                        theme={theme}
+                        toggleTheme={toggleTheme}
+                    />
+                </div>
 
-      {/* Main Chat Area */}
-      <div className="flex flex-1 flex-col h-full overflow-hidden relative">
-        <ChatHeader currentRoom={currentRoom} />
-        
-        <MessageList 
-          messages={currentMessages} 
-          currentUser={username} 
-          isOtherTyping={otherTyping}
-        />
-        
-        <MessageInput 
-          onSendMessage={handleSendMessage} 
-          onTyping={handleTyping}
-        />
-      </div>
-    </div>
+                {/* Main Chat Area */}
+                <div className="flex flex-1 flex-col h-full overflow-hidden relative">
+                    <ChatHeader currentRoom={currentRoom} />
+                    
+                    <MessageList 
+                        messages={currentMessages} 
+                        currentUser={username} 
+                        isOtherTyping={otherTyping}
+                    />
+                    
+                    <MessageInput 
+                        onSendMessage={handleSendMessage} 
+                        onTyping={handleTyping}
+                    />
+                </div>
+            </div>
+        </ProtectedRoute>
+    </>
   );
 }
 

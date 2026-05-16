@@ -1,9 +1,9 @@
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
-import AppError from "./appError";
+import AppError from "./appError.js";
 
-export const signAccessToken = (userId) => {
-    jwt.sign({ sub: userId }, process.env.SECRECT_TOKEN, { expiresIn: process.env.EXPIRY_TIME || '15m' });
+export const signAccessToken = (userId) => {        
+   return jwt.sign({ sub: userId }, process.env.SECRECT_TOKEN, { expiresIn: process.env.EXPIRY_TIME || '15m' });
 }
 
 export const verifyAccessToken = (token) => {
@@ -15,7 +15,7 @@ export const verifyAccessToken = (token) => {
 }
 
 export const signRefreshToken = (userId) => {
-    jwt.sign({ sub: userId }, process.env.REFRESH_TOKEN, { expiresIn: process.env.REFRESH_TOKEN_EXPIRESIN || '7d' });
+    return jwt.sign({ sub: userId }, process.env.REFRESH_TOKEN, { expiresIn: process.env.REFRESH_TOKEN_EXPIRESIN || '7d' });
 }
 
 export const verifyRefreshToken = (token) => {
@@ -26,9 +26,8 @@ export const verifyRefreshToken = (token) => {
     }
 }
 
-export const hashToken = () => {
-    crypto.createHash('sha256').update(token).digit('hex');
-}
+export const hashToken = (token) =>  crypto.createHash('sha256').update(token).digest('hex');
+
 
 export const refreshTokenExpiry = () => {
     const days = parseInt(process.env.REFRESH_TOKEN_EXPIRESIN || '7d');
