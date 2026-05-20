@@ -1,28 +1,22 @@
-import React, {useCallback,useEffect,useState, createContext} from "react";
-import axiosInstance,{setAccessToken, clearAccessToken} from "../api/axiosInstance";
+import { createContext, useState, useCallback, useEffect, useMemo } from 'react';
+import axiosInstance, { setAccessToken, clearAccessToken } from '../api/axiosInstance';
 
-export const AuthContext = createContext();
+export const AuthContext = createContext(null);
 
-export function AuthProvider({children}){
+export function AuthProvider({ children }) {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
     const [isInitialized, setIsInitialized] = useState(false);
+    const [error, setError] = useState(null);
 
-    useEffect(()=>{
-        refreshAuthState();
-    },[]);
-
-    const refreshAuthState = useCallback(async()=>{
+    const refreshAuthState = useCallback(async () => {
         try {
             setLoading(true);
-            const {data} = await axiosInstance.post('auth/refresh');
+            const { data } = await axiosInstance.post('/auth/refresh');
             setAccessToken(data.accessToken);
-            
-            const {userData} = await axiosInstance.post('/profile');
-            setUser(userData);
+            setUser(data.user);
             setError(null);
-        } catch (error) {
+        } catch (err) {
             clearAccessToken();
             setUser(null);
             setError('Not authenticated');
@@ -30,8 +24,11 @@ export function AuthProvider({children}){
             setLoading(false);
             setIsInitialized(true);
         }
+    }, []); 
 
-    },[]);
+    useEffect(() => {
+        refreshAuthState();
+    }, []);
 
     const register = useCallback(async(name,email,password)=>{
         try {
@@ -75,12 +72,17 @@ export function AuthProvider({children}){
             setLoading(false);
         }
     }, []);
+    
+    const value = useMemo(() => ({
+        user,
+        loading,
+        isInitialized,
+        error,
+        refreshAuthState,
+        register,
+        login,
+        logout
+    }), [user, loading, isInitialized, error, refreshAuthState]);
 
-
-    return (
-        <AuthContext.Provider value={{ user, loading, error, isInitialized, register, login, logout }}>
-            {children}
-        </AuthContext.Provider>
-    );
-
+    return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

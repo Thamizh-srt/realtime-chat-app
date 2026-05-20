@@ -1,4 +1,4 @@
-import { Hash, Settings, Users, LogOut, Search } from 'lucide-react';
+import { Hash, Settings, Users, LogOut, Search, Plus } from 'lucide-react';
 import { cn } from '../lib/utils';
 import ThemeToggle from './ThemeToggle';
 
@@ -54,7 +54,7 @@ export default function Sidebar({ username, currentRoom, onRoomChange, onLogout,
               Channels
             </h3>
             <button className="text-muted-foreground hover:text-foreground transition-colors">
-              <Hash className="h-4 w-4" />
+              <Plus className="h-4 w-4 cursor-pointer" />
             </button>
           </div>
           <div className="space-y-0.5">
@@ -122,7 +122,7 @@ export default function Sidebar({ username, currentRoom, onRoomChange, onLogout,
             className="flex items-center gap-2 rounded-lg p-2 text-sm font-medium text-red-500 transition-colors hover:bg-red-500/10"
             title="Log out"
           >
-            <LogOut className="h-4 w-4" />
+            <LogOut className="h-4 w-4 cursor-pointer" />
           </button>
         </div>
       </div>
