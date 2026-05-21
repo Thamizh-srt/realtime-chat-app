@@ -1,8 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import Sidebar from './components/Sidebar';
 import ChatHeader from './components/ChatHeader';
 import MessageList from './components/MessageList';
 import MessageInput from './components/MessageInput';
+import ChannelModal from './components/ChannelModal';
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useAuth } from './hooks/useAuth';
@@ -144,6 +145,7 @@ function App() {
                     />
                 </div>
             </div>
+            <ChannelModal />
         </ProtectedRoute>
     </>
   );

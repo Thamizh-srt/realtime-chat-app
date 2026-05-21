@@ -54,7 +54,7 @@ export const loginService = async({name,password})=>{
     }
 }
 
-export const refreshService = async(oldRefreshToken=null)=>{           
+export const refreshService = async(oldRefreshToken=null)=>{    
     if(!oldRefreshToken) throw new AppError('Refresh token is required!',401);
     
     const payload = verifyRefreshToken(oldRefreshToken);        
@@ -62,7 +62,6 @@ export const refreshService = async(oldRefreshToken=null)=>{
     
     const hashedOldToken = hashToken(oldRefreshToken);
     const storedToken = await prisma.refreshToken.findFirst({ where: { tokenHash: hashedOldToken } });
-    
     if(!storedToken || storedToken.expiresAt < new Date()) throw new AppError('Refresh token is invalid or expired!',401);
     
     await prisma.refreshToken.delete({ where: { tokenHash: hashedOldToken } });
