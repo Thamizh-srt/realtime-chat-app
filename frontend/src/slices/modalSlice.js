@@ -5,9 +5,10 @@ import {createChannel} from '../thunks/createChannelThunk';
 const initialState = {
     isOpen:false,
     isChannelModalOpen:false,
-    channelToEdit:null,
+    channelName:"",
     mode:'add',
-    channel:"add"
+    channel:"add",
+    channelId:null,
 };
 
 const modalSlice = createSlice({
@@ -15,17 +16,21 @@ const modalSlice = createSlice({
     initialState,
     reducers:{
         openModal:(state)=>{
-            debugger
             state.isOpen = true;
             state.mode = 'add';
         },
         closeModal:(state)=>{
             state.isOpen = false;
         },
-        editOpenModal:(state)=>{
+        editOpenModal:(state,action)=>{
             state.isOpen = true;
             state.mode = 'edit';
+            state.channelName = action.payload.name;
+            state.channelId = action.payload.id;
         },
+        setChannelName:(state,action)=>{
+            state.channelName = action.payload;
+        }
     },
     extraReducers:(builder)=>{
         builder
@@ -41,7 +46,7 @@ const modalSlice = createSlice({
             state.loading = false;
             state.isOpen = false;
         })
-    }
+    } 
 });
 
 export const {openModal,closeModal,editOpenModal,submitModal} = modalSlice.actions;

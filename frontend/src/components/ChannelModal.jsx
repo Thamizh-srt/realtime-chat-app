@@ -4,23 +4,20 @@ import {openModal,closeModal} from '../slices/modalSlice';
 import { createChannel } from '../thunks/createChannelThunk';
 
 export default function ChannelModal() {
-  const [channelName, setChannelName] = useState('');
-
     const dispatch = useDispatch();
-    const { isChannelModalOpen, channelToEdit, isOpen, mode, channel } = useSelector((state) => state.modal);
+    const { isChannelModalOpen, channelName, isOpen, mode, channel, channelId} = useSelector((state) => state.modal);
     const onClose = ()=>{
         dispatch({type:'modal/closeModal'});
     }
 
-    const onSubmit = (name)=>{
+    const onSubmit = (name, id)=>{
         if(name.trim()){
-            dispatch(createChannel(name.trim()));
+            dispatch(createChannel({name: name.trim(), id}));
         }   
     }
-
-    //   useEffect(() => {
-    //     setChannelName(channel?.name ?? '');
-    //   }, [channel]);
+    const setChannelName = (name)=>{
+        dispatch({type:'modal/setChannelName', payload:name});
+    }
 
   if (!isOpen) {
     return null;
@@ -64,7 +61,7 @@ export default function ChannelModal() {
           onKeyDown={(event) => {
             if (event.key === 'Enter') {
               event.preventDefault();
-              onSubmit(channelName);
+              onSubmit(channelName,channelId);
             }
           }}
         />
@@ -79,7 +76,7 @@ export default function ChannelModal() {
           </button>
           <button
             type="button"
-            onClick={() => onSubmit(channelName)}
+            onClick={() => onSubmit(channelName, channelId)}
             className="rounded-2xl bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
           >
             {mode === 'edit' ? 'Save changes' : 'Create channel'}

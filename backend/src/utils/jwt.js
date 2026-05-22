@@ -8,7 +8,7 @@ export const signAccessToken = (userId) => {
 
 export const verifyAccessToken = (token) => {
     try {
-        jwt.verify(token, process.env.SECRECT_TOKEN);
+        return jwt.verify(token, process.env.SECRECT_TOKEN);
     } catch (error) {
         throw new AppError('Invalid or expired access token', 401);
     }

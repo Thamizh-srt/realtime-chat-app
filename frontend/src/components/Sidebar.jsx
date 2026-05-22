@@ -1,9 +1,13 @@
-import { Hash, Settings, Users, LogOut, Search, Plus, Edit3 } from 'lucide-react';
+import { Hash, Settings, Users, LogOut, Search, Plus, Edit3, MoreVertical } from 'lucide-react';
 import { cn } from '../lib/utils';
 import ThemeToggle from './ThemeToggle';
 import { openModal,editOpenModal } from '../slices/modalSlice';
 import { useDispatch } from 'react-redux';
 import {useChannels} from '../hooks/useChannel';
+import {useState, useRef, useEffect} from 'react';
+import axiosInstance from '../api/axiosInstance';
+import {queryClient} from '../api/queryClient';
+
 const USERS = [
   { id: '1', name: 'Alice', status: 'online', avatar: 'https://i.pravatar.cc/150?u=1' },
   { id: '2', name: 'Bob', status: 'offline', avatar: 'https://i.pravatar.cc/150?u=2' },
@@ -12,7 +16,31 @@ const USERS = [
 
 export default function Sidebar({ username, currentRoom, onRoomChange, onLogout, theme, toggleTheme }) {
     const dispatch = useDispatch();
-    const { data: channels } = useChannels();
+    let { data: channels } = useChannels();
+    const [openId, setOpenId] = useState(null);
+    useEffect(() => {
+        const handleClickOutside = () => {
+            setOpenId(null);
+        };
+
+        document.addEventListener("click", handleClickOutside);
+
+        return () => {
+            document.removeEventListener("click", handleClickOutside);
+        };
+    }, []);
+
+    const deleteChannel = async(id)=>{
+        try { 
+            debugger                  
+            const response = await axiosInstance.post('/channel/delete',{id});
+            queryClient.invalidateQueries(['channels']);
+            return response.data;
+        } catch (error) {
+            throw error;
+        }
+    }
+
     
   return (
     <div className="flex h-full w-64 md:w-72 flex-col border-r border-border bg-background transition-colors duration-300">
@@ -65,9 +93,28 @@ export default function Sidebar({ username, currentRoom, onRoomChange, onLogout,
                   <Hash className={cn("h-4 w-4 shrink-0", currentRoom === channel.id ? "text-primary" : "text-muted-foreground group-hover:text-foreground")} />
                   <span className="truncate">{channel.name}</span>
                 </button>
-                <button onClick={() => dispatch(editOpenModal())} className="ml-2 rounded-xl p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground" aria-label={`Edit ${channel.name}`} >
-                  <Edit3 className="h-4 w-4" />
-                </button>
+                <div className="relative" onClick={(e) => e.stopPropagation()}>
+                    <button onClick={(e) => setOpenId(openId === channel.id ? null : channel.id)} className="p-1 rounded hover:bg-zinc-700">
+                        <MoreVertical size={18} />
+                    </button>
+                    {openId === channel.id && (
+                        <div className="absolute right-0 mt-2 w-44 rounded-lg bg-zinc-900 border border-zinc-700 shadow-lg overflow-hidden z-50">
+                            <button className="w-full text-left px-4 py-2 hover:bg-zinc-800 text-sm" onClick={(e) => dispatch(editOpenModal(channel))} aria-label={`Edit ${channel.name}`}>
+                                Edit Channel
+                            </button>
+                            <button className="w-full text-left px-4 py-2 hover:bg-zinc-800 text-sm" aria-label={`Join ${channel.name}`}> Join Channel </button>
+                            <button className="w-full text-left px-4 py-2 hover:bg-zinc-800 text-sm" aria-label={`Leave ${channel.name}`}>
+                                Leave Channel
+                            </button>
+                            <button className="w-full text-left px-4 py-2 hover:bg-red-500/20 text-red-400 text-sm" aria-label={`Delete ${channel.name}`} onClick={()=> deleteChannel(channel.id)}>
+                                Delete Channel
+                            </button>
+                        </div>
+                    )}
+                    {/* <button onClick={() => dispatch(editOpenModal(channel))} className="ml-2 rounded-xl p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground" aria-label={`Edit ${channel.name}`} >
+                    <MoreVertical  className="h-4 w-4" />
+                    </button> */}
+                </div>
               </div>
             ))}
           </div>

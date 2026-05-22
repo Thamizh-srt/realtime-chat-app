@@ -4,9 +4,9 @@ import { queryClient} from '../api/queryClient';
 
 export const createChannel = createAsyncThunk(
     'modal/createChannel',  
-    async(channelName)=>{
+    async({name,id})=>{
         try {                   
-            const response = await axiosInstance.post('/channel/create',{name:channelName});
+            const response = await axiosInstance.post('/channel/create',{name,id});
             queryClient.invalidateQueries({ queryKey: ['channels'] });
             return response.data;
         } catch (error) {

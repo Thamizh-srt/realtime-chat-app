@@ -1,12 +1,18 @@
 import { catchAsync } from "../utils/appError.js";
-import{createService, listService} from "../services/channelService.js";
+import{createService, listService, deleteService} from "../services/channelService.js";
 
 export const createChannel = catchAsync(async (req, res) => {
-    const channel = await createService(req.body);
+    const channel = await createService(req.body, req.user.id);
     res.status(201).json({message:'Channel created successfully!', channel});
 });
 
-export const getChannel = catchAsync(async(req,res)=>{
+export const getChannel = catchAsync(async(req,res)=>{    
     const channels = await listService();
     res.status(200).json(channels);
+});
+
+export const deleteChannel = catchAsync(async(req,res)=>{
+    const {id} = req.body;
+    const channel = await deleteService(id);
+    res.status(200).json({message:'Channel deleted successfully!', channel});
 });
