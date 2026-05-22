@@ -8,5 +8,6 @@ channelRouter.use(protect);
 channelRouter.post("/create", createChannel);
 channelRouter.get("/list", getChannel);
 channelRouter.post("/delete", deleteChannel);
+channelRouter.get("/:id", deleteChannel);
 
 export default channelRouter;
