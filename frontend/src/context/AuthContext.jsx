@@ -12,14 +12,17 @@ export function AuthProvider({ children }) {
     const refreshAuthState = useCallback(async () => {
         try {
             setLoading(true);
+            setError(null);
             const { data } = await axiosInstance.post('/auth/refresh');
             setAccessToken(data.accessToken);
             setUser(data.user);
             setError(null);
         } catch (err) {
+            // User is not authenticated - this is normal on first visit or after logout
             clearAccessToken();
             setUser(null);
-            setError('Not authenticated');
+            // Don't show error, just mark as not authenticated
+            setError(null);
         } finally {
             setLoading(false);
             setIsInitialized(true);
@@ -28,7 +31,7 @@ export function AuthProvider({ children }) {
 
     useEffect(() => {
         refreshAuthState();
-    }, []);
+    }, []); // Empty dependency array - runs only once on mount
 
     const register = useCallback(async(name,email,password)=>{
         try {

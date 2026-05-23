@@ -5,8 +5,7 @@ import { openModal,editOpenModal } from '../slices/modalSlice';
 import { useDispatch } from 'react-redux';
 import {useChannels} from '../hooks/useChannel';
 import {useState, useRef, useEffect} from 'react';
-import axiosInstance from '../api/axiosInstance';
-import {queryClient} from '../api/queryClient';
+import { useRooms } from '../hooks/useRooms';
 
 const USERS = [
   { id: '1', name: 'Alice', status: 'online', avatar: 'https://i.pravatar.cc/150?u=1' },
@@ -16,8 +15,9 @@ const USERS = [
 
 export default function Sidebar({ username, currentRoom, onRoomChange, onLogout, theme, toggleTheme }) {
     const dispatch = useDispatch();
-    let { data: channels } = useChannels();
     const [openId, setOpenId] = useState(null);
+    const {rooms, deleteChannel, setActiveRoom } = useRooms();
+
     useEffect(() => {
         const handleClickOutside = () => {
             setOpenId(null);
@@ -30,16 +30,6 @@ export default function Sidebar({ username, currentRoom, onRoomChange, onLogout,
         };
     }, []);
 
-    const deleteChannel = async(id)=>{
-        try { 
-            debugger                  
-            const response = await axiosInstance.post('/channel/delete',{id});
-            queryClient.invalidateQueries(['channels']);
-            return response.data;
-        } catch (error) {
-            throw error;
-        }
-    }
 
     
   return (
@@ -80,7 +70,7 @@ export default function Sidebar({ username, currentRoom, onRoomChange, onLogout,
                 </button>
             </div>
           <div className="space-y-2">
-            {channels && channels.map((channel) => (
+            {rooms && rooms.map((channel) => (
               <div key={channel.id} className="group flex items-center justify-between rounded-lg px-3 py-1 transition-all hover:bg-muted">              
                 <button onClick={() => onRoomChange(channel.id)}
                   className={cn(

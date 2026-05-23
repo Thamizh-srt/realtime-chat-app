@@ -38,10 +38,10 @@ export const deleteService = async(id)=>{
         const channel = await prisma.room.delete({
             where:{id}
         })
+        return channel;
     } catch (error) {
         throw new AppError('Error while deleting!',409);
     }
-    return channel;
 }
 
 export const getchannelById = async(roomId)=>{
@@ -56,4 +56,20 @@ export const getchannelById = async(roomId)=>{
     if(!room) throw new AppError('Room not found',409);
 
     return room;
+}
+
+export const leaveChannelService = async(roomId, userId)=>{
+    try {
+        const channel = await prisma.members.delete({
+            where: {
+                roomId_userId: {
+                    roomId,
+                    userId
+                }
+            }
+        });
+        return channel;
+    } catch (error) {
+        throw new AppError('Error while leaving channel!', 409);
+    }
 }

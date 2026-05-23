@@ -7,13 +7,16 @@ import store from './app/store';
 import { Provider } from 'react-redux';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { queryClient } from './api/queryClient';
+import { RoomProvider } from './context/RoomContext';
 
 createRoot(document.getElementById('root')).render(
     <StrictMode>
         <QueryClientProvider client={queryClient}>
             <Provider store={store}>
                 <AuthProvider>
-                    <App />
+                    <RoomProvider>
+                        <App />
+                    </RoomProvider>
                 </AuthProvider>
             </Provider>
         </QueryClientProvider>

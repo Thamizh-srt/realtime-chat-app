@@ -21,3 +21,9 @@ export const getSingleChannel = catchAsync(async(req, res)=>{
     const channel = await getchannelById(req.body.roomId);
     res.status(201).json({channel});
 });
+
+export const leaveChannel = catchAsync(async(req,res)=>{
+    const {roomId} = req.body;
+    const channel = await deleteService(roomId);
+    res.status(200).json({message:'Left channel successfully!', channel});
+});

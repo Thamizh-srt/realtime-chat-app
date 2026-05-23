@@ -1,6 +1,5 @@
 import {createSlice} from '@reduxjs/toolkit';
 import axiosInstance from '../api/axiosInstance';
-import {createChannel} from '../thunks/createChannelThunk';
 
 const initialState = {
     isOpen:false,
@@ -31,22 +30,7 @@ const modalSlice = createSlice({
         setChannelName:(state,action)=>{
             state.channelName = action.payload;
         }
-    },
-    extraReducers:(builder)=>{
-        builder
-        .addCase(createChannel.pending,(state)=>{
-            state.loading = true;
-        })
-        .addCase(createChannel.fulfilled,(state,action)=>{
-            state.loading = false;
-            state.channel = action.payload.channel;
-            state.isOpen = false;
-        })
-        .addCase(createChannel.rejected,(state,action)=>{
-            state.loading = false;
-            state.isOpen = false;
-        })
-    } 
+    }
 });
 
 export const {openModal,closeModal,editOpenModal,submitModal} = modalSlice.actions;

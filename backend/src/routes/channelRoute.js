@@ -1,4 +1,4 @@
-import {createChannel, getChannel, deleteChannel} from '../controllers/channelController.js';
+import {createChannel, getChannel, deleteChannel, leaveChannel} from '../controllers/channelController.js';
 import { Router } from "express";
 import { protect } from '../middlewares/authMiddleware.js';
 const channelRouter = Router();
@@ -8,6 +8,6 @@ channelRouter.use(protect);
 channelRouter.post("/create", createChannel);
 channelRouter.get("/list", getChannel);
 channelRouter.post("/delete", deleteChannel);
-channelRouter.get("/:id", deleteChannel);
+channelRouter.post("/leave", leaveChannel);
 
 export default channelRouter;

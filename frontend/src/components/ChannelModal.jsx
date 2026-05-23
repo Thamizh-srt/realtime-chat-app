@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {openModal,closeModal} from '../slices/modalSlice';
-import { createChannel } from '../thunks/createChannelThunk';
+import {useRooms} from '../hooks/useRooms';
 
 export default function ChannelModal() {
+    const { createRoom } = useRooms();
     const dispatch = useDispatch();
     const { isChannelModalOpen, channelName, isOpen, mode, channel, channelId} = useSelector((state) => state.modal);
     const onClose = ()=>{
@@ -12,7 +13,7 @@ export default function ChannelModal() {
 
     const onSubmit = (name, id)=>{
         if(name.trim()){
-            dispatch(createChannel({name: name.trim(), id}));
+            createRoom({name: name.trim(), id});
         }   
     }
     const setChannelName = (name)=>{
