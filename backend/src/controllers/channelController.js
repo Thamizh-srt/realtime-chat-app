@@ -1,5 +1,5 @@
 import { catchAsync } from "../utils/appError.js";
-import{createService, listService, deleteService, getchannelById} from "../services/channelService.js";
+import{createService, listService, deleteService, getchannelById, joinChannelService, leaveChannelService} from "../services/channelService.js";
 
 export const createChannel = catchAsync(async (req, res) => {
     const channel = await createService(req.body, req.user.id);
@@ -18,12 +18,18 @@ export const deleteChannel = catchAsync(async(req,res)=>{
 });
 
 export const getSingleChannel = catchAsync(async(req, res)=>{
-    const channel = await getchannelById(req.body.roomId);
+    const channel = await getchannelById(req.params.id);
     res.status(201).json({channel});
 });
 
 export const leaveChannel = catchAsync(async(req,res)=>{
     const {roomId} = req.body;
-    const channel = await deleteService(roomId);
+    const channel = await leaveChannelService(roomId, req.user.id);
     res.status(200).json({message:'Left channel successfully!', channel});
+});
+
+export const joinChannel = catchAsync(async(req,res)=>{ 
+    const {roomId} = req.body;
+    const channel = await joinChannelService(roomId, req.user.id);
+    res.status(200).json({message:'Joined channel successfully!', channel});
 });

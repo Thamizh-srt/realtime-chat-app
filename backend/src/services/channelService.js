@@ -60,7 +60,7 @@ export const getchannelById = async(roomId)=>{
 
 export const leaveChannelService = async(roomId, userId)=>{
     try {
-        const channel = await prisma.members.delete({
+        const channel = await prisma.roomMember.delete({
             where: {
                 roomId_userId: {
                     roomId,
@@ -72,4 +72,21 @@ export const leaveChannelService = async(roomId, userId)=>{
     } catch (error) {
         throw new AppError('Error while leaving channel!', 409);
     }
+}
+
+export const joinChannelService = async(roomId, userId)=>{
+    const room = await prisma.room.findUnique({where:{id:roomId}});
+    if(!room) throw new AppError('Room not found', 404);
+    try {
+        const channel = await prisma.roomMember.upsert({
+            where: { roomId_userId: {roomId, userId} },
+            update:{},  
+            create:{roomId, userId}
+        });
+        return channel;
+    } catch (error) {
+        console.log(error);
+        
+        throw new AppError('Error while joining channel!', 409);
+    }   
 }

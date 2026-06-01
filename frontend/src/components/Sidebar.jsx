@@ -13,16 +13,14 @@ const USERS = [
   { id: '3', name: 'Charlie', status: 'online', avatar: 'https://i.pravatar.cc/150?u=3' },
 ];
 
-export default function Sidebar({ username, currentRoom, onRoomChange, onLogout, theme, toggleTheme }) {
+export default function Sidebar({ username, currentRoom, onLogout, theme, toggleTheme }) {
     const dispatch = useDispatch();
     const [openId, setOpenId] = useState(null);
-    const {rooms, deleteChannel, setActiveRoom } = useRooms();
-
+    const {rooms, deleteChannel,joinRoom,leaveRoom, getRoomById } = useRooms();
+    const handleClickOutside = () => {
+        setOpenId(null);
+    };
     useEffect(() => {
-        const handleClickOutside = () => {
-            setOpenId(null);
-        };
-
         document.addEventListener("click", handleClickOutside);
 
         return () => {
@@ -72,9 +70,9 @@ export default function Sidebar({ username, currentRoom, onRoomChange, onLogout,
           <div className="space-y-2">
             {rooms && rooms.map((channel) => (
               <div key={channel.id} className="group flex items-center justify-between rounded-lg px-3 py-1 transition-all hover:bg-muted">              
-                <button onClick={() => onRoomChange(channel.id)}
+                <button onClick={() => getRoomById(channel.id)}
                   className={cn(
-                    "flex min-w-0 flex-1 items-center gap-2 text-sm font-medium text-left",
+                    "flex min-w-0 flex-1 items-center gap-2 text-sm font-medium text-left cursor-pointer",
                     currentRoom === channel.id
                       ? "text-primary"
                       : "text-muted-foreground"
@@ -92,8 +90,8 @@ export default function Sidebar({ username, currentRoom, onRoomChange, onLogout,
                             <button className="w-full text-left px-4 py-2 hover:bg-zinc-800 text-sm" onClick={(e) => dispatch(editOpenModal(channel))} aria-label={`Edit ${channel.name}`}>
                                 Edit Channel
                             </button>
-                            <button className="w-full text-left px-4 py-2 hover:bg-zinc-800 text-sm" aria-label={`Join ${channel.name}`}> Join Channel </button>
-                            <button className="w-full text-left px-4 py-2 hover:bg-zinc-800 text-sm" aria-label={`Leave ${channel.name}`}>
+                            <button className="w-full text-left px-4 py-2 hover:bg-zinc-800 text-sm" aria-label={`Join ${channel.name}`}onClick={(e)=>{joinRoom(channel.id);handleClickOutside()}}> Join Channel </button>
+                            <button className="w-full text-left px-4 py-2 hover:bg-zinc-800 text-sm" aria-label={`Leave ${channel.name}`} onClick={(e)=>{leaveRoom(channel.id);handleClickOutside()}}>
                                 Leave Channel
                             </button>
                             <button className="w-full text-left px-4 py-2 hover:bg-red-500/20 text-red-400 text-sm" aria-label={`Delete ${channel.name}`} onClick={()=> deleteChannel(channel.id)}>

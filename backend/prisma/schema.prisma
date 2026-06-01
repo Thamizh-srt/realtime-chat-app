@@ -61,6 +61,7 @@ model RoomMember {
 
   @@id([userId, roomId])
   @@map("room_members")
+  @@unique([roomId, userId])
 }
 
 model Message {

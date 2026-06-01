@@ -3,6 +3,7 @@ import axiosInstance from '../api/axiosInstance';
 import { useAuth } from '../hooks/useAuth';
 import { closeModal } from '../slices/modalSlice';
 import { useDispatch } from 'react-redux';
+import { toast } from "react-toastify";
 
 export const RoomContext = createContext();
 
@@ -47,8 +48,10 @@ export const RoomProvider = ({children})=>{
     const joinRoom = async(roomId)=>{
         try {
             const response = await axiosInstance.post('/channel/join',{roomId});
+            toast.success('Successfully joined channel');
             return response.data;
         } catch (error) {
+            toast.error(error.response?.data?.error || error.message || 'Failed to join channel');
             throw error;
         }
     }
@@ -56,8 +59,10 @@ export const RoomProvider = ({children})=>{
     const leaveRoom = async(roomId)=>{
         try {
             const response = await axiosInstance.post('/channel/leave',{roomId});
+            toast.success('Successfully left channel');
             return response.data;
         } catch (error) {
+            toast.error(error.response?.data?.error || error.message || 'Failed to leave channel');
             throw error;
         }
     }
@@ -74,8 +79,20 @@ export const RoomProvider = ({children})=>{
         }
     }
 
+    const getRoomById = async(roomId)=>{
+        try {
+            debugger;
+            const response = await axiosInstance.get(`/channel/${roomId}`); 
+            setActiveRoom(response.data);
+            return response.data;
+        } catch (error) {
+            console.error('Error fetching room by ID:', error);
+            throw error;
+        }
+    }
+
     return (
-        <RoomContext.Provider value={{ rooms, activeRoom, fetchRooms, joinRoom, leaveRoom, createRoom, setActiveRoom, deleteChannel }}>
+        <RoomContext.Provider value={{ rooms, activeRoom, fetchRooms, joinRoom, leaveRoom, createRoom, setActiveRoom, deleteChannel, getRoomById }}>
             {children}
         </RoomContext.Provider>
     )
