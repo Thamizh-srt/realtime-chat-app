@@ -8,6 +8,7 @@ import { Provider } from 'react-redux';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { queryClient } from './api/queryClient';
 import { RoomProvider } from './context/RoomContext';
+import {MessageProvider} from './context/MessageContext';
 
 createRoot(document.getElementById('root')).render(
     <StrictMode>
@@ -15,7 +16,9 @@ createRoot(document.getElementById('root')).render(
             <Provider store={store}>
                 <AuthProvider>
                     <RoomProvider>
-                        <App />
+                        <MessageProvider>
+                            <App />
+                        </MessageProvider>
                     </RoomProvider>
                 </AuthProvider>
             </Provider>

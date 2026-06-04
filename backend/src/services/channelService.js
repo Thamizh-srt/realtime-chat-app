@@ -49,7 +49,8 @@ export const getchannelById = async(roomId)=>{
         where:{id:roomId},
         include:{
             members:{include:{user:{select:{id:true,name:true}}}},
-            _count:{select:{messages:true}}
+            messages:{select:{id:true,content:true,userId:true,createdAt:true,roomId:true}},
+            _count:{select:{messages:true,members:true}}
         }
     });
 

@@ -81,9 +81,8 @@ export const RoomProvider = ({children})=>{
 
     const getRoomById = async(roomId)=>{
         try {
-            debugger;
             const response = await axiosInstance.get(`/channel/${roomId}`); 
-            setActiveRoom(response.data);
+            setActiveRoom(response.data.channel);
             return response.data;
         } catch (error) {
             console.error('Error fetching room by ID:', error);

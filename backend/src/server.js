@@ -4,6 +4,7 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import loginRouter from "./routes/loginRoutes.js";
 import channelRouter from "./routes/channelRoute.js";
+import messageRouter from "./routes/messageRoute.js";
 import { golbalErrorHandler, notFound } from "../src/middlewares/errorMiddleware.js"
 
 dotenv.config();
@@ -21,6 +22,7 @@ app.use(cookieParser());
 
 app.use('/auth', loginRouter);
 app.use('/channel', channelRouter);
+app.use('/messages', messageRouter);
 app.use(notFound);
 app.use(golbalErrorHandler);
 

@@ -1,11 +1,12 @@
 import { useState, useRef, useEffect } from 'react';
 import { Smile, Paperclip, Send, Mic } from 'lucide-react';
 import { cn } from '../lib/utils';
+import {useMessage} from '../hooks/useMessage';
 
 export default function MessageInput({ onSendMessage, onTyping }) {
   const [text, setText] = useState('');
   const inputRef = useRef(null);
-
+  const { sendMessage } = useMessage();
   // Handle typing indicator logic
   useEffect(() => {
     if (text.length > 0) {
@@ -20,7 +21,7 @@ export default function MessageInput({ onSendMessage, onTyping }) {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (text.trim()) {
-      onSendMessage(text.trim());
+      sendMessage(text.trim());
       setText('');
       onTyping(false);
       // Keep focus on input after sending
@@ -60,10 +61,10 @@ export default function MessageInput({ onSendMessage, onTyping }) {
             placeholder="Type a message..."
             className="max-h-32 min-h-[44px] w-full resize-none bg-transparent py-3 pl-4 pr-12 text-[15px] text-foreground placeholder-muted-foreground focus:outline-none custom-scrollbar"
             rows={1}
-            style={{
-              height: '44px',
-              // Auto-grow logic would go here if needed
-            }}
+            // style={{
+            //   height: '44px',
+            //   // Auto-grow logic would go here if needed
+            // }}
           />
           <button
             type="button"

@@ -1,6 +1,9 @@
 import { Hash, Phone, Video, Info, Search, MoreVertical } from 'lucide-react';
+import {useRooms} from '../hooks/useRooms';
 
-export default function ChatHeader({ currentRoom }) {
+export default function ChatHeader() {
+    const { activeRoom } = useRooms();
+
   return (
     <div className="flex h-16 shrink-0 items-center justify-between border-b border-border bg-background/95 px-6 backdrop-blur supports-[backdrop-filter]:bg-background/60 transition-colors duration-300">
       <div className="flex items-center gap-3">
@@ -9,10 +12,10 @@ export default function ChatHeader({ currentRoom }) {
         </div>
         <div className="flex flex-col">
           <h2 className="text-base font-semibold text-foreground capitalize">
-            {currentRoom}
+            {activeRoom && activeRoom.name}
           </h2>
           <span className="text-xs text-muted-foreground">
-            3 members · 2 online
+            {activeRoom && activeRoom._count?.members} members · 2 online
           </span>
         </div>
       </div>
