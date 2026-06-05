@@ -34,7 +34,7 @@ export default function MessageList({ currentUser, isOtherTyping }) {
             </div>
             
             {activeRoom?.messages.map((message, index) => {
-              const isOwnMessage = message.id === user?.id;
+              const isOwnMessage = message.userId === user?.id;
               // Check if previous message is from same sender to group them
               const prevMessage = index > 0 ? activeRoom.messages[index - 1] : null;
               const isGrouped = prevMessage && prevMessage.sender === message.sender;

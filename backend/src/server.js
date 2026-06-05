@@ -5,6 +5,7 @@ import cookieParser from "cookie-parser";
 import loginRouter from "./routes/loginRoutes.js";
 import channelRouter from "./routes/channelRoute.js";
 import messageRouter from "./routes/messageRoute.js";
+import profileRouter from "./routes/profileRoutes.js";
 import { golbalErrorHandler, notFound } from "../src/middlewares/errorMiddleware.js"
 
 dotenv.config();
@@ -13,7 +14,7 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 app.use(cors({
-  origin: process.env.CLIENT_URL || 'http://localhost:5174',
+  origin: process.env.CLIENT_URL || 'http://localhost:5173',
   credentials: true,
 }));
 app.use(express.json());
@@ -23,6 +24,7 @@ app.use(cookieParser());
 app.use('/auth', loginRouter);
 app.use('/channel', channelRouter);
 app.use('/messages', messageRouter);
+app.use('/users', profileRouter);
 app.use(notFound);
 app.use(golbalErrorHandler);
 

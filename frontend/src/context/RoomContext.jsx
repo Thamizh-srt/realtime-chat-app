@@ -91,7 +91,7 @@ export const RoomProvider = ({children})=>{
     }
 
     return (
-        <RoomContext.Provider value={{ rooms, activeRoom, fetchRooms, joinRoom, leaveRoom, createRoom, setActiveRoom, deleteChannel, getRoomById }}>
+        <RoomContext.Provider value={{user, rooms, activeRoom, fetchRooms, joinRoom, leaveRoom, createRoom, setActiveRoom, deleteChannel, getRoomById }}>
             {children}
         </RoomContext.Provider>
     )

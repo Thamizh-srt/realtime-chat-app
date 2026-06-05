@@ -50,7 +50,7 @@ export default function MessageBubble({ message, isOwnMessage, showAvatar = true
                 : "bg-white dark:bg-muted text-foreground border border-border rounded-bl-sm"
             )}
           >
-            <p className="whitespace-pre-wrap break-words">{message.text}</p>
+            <p className="whitespace-pre-wrap break-words">{message.content}</p>
           </div>
           
           {/* Timestamp - shown on hover or permanently below */}

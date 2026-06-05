@@ -6,17 +6,19 @@ import { useDispatch } from 'react-redux';
 import {useChannels} from '../hooks/useChannel';
 import {useState, useRef, useEffect} from 'react';
 import { useRooms } from '../hooks/useRooms';
+import { useUsers } from '../hooks/useUsers';
 
-const USERS = [
-  { id: '1', name: 'Alice', status: 'online', avatar: 'https://i.pravatar.cc/150?u=1' },
-  { id: '2', name: 'Bob', status: 'offline', avatar: 'https://i.pravatar.cc/150?u=2' },
-  { id: '3', name: 'Charlie', status: 'online', avatar: 'https://i.pravatar.cc/150?u=3' },
-];
+// const USERS = [
+//   { id: '1', name: 'Alice', status: 'online', avatar: 'https://i.pravatar.cc/150?u=1' },
+//   { id: '2', name: 'Bob', status: 'offline', avatar: 'https://i.pravatar.cc/150?u=2' },
+//   { id: '3', name: 'Charlie', status: 'online', avatar: 'https://i.pravatar.cc/150?u=3' },
+// ];
 
 export default function Sidebar({ username, currentRoom, onLogout, theme, toggleTheme }) {
     const dispatch = useDispatch();
     const [openId, setOpenId] = useState(null);
     const {rooms, deleteChannel,joinRoom,leaveRoom, getRoomById } = useRooms();
+    const { users } = useUsers();
     const handleClickOutside = () => {
         setOpenId(null);
     };
@@ -119,7 +121,7 @@ export default function Sidebar({ username, currentRoom, onLogout, theme, toggle
             </button>
           </div>
           <div className="space-y-0.5">
-            {USERS.map((user) => (
+            {users && users.map((user) => (
               <button
                 key={user.id}
                 className="group flex w-full items-center gap-3 rounded-lg px-3 py-2 transition-all hover:bg-muted text-left"

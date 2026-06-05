@@ -9,6 +9,7 @@ import { QueryClientProvider } from '@tanstack/react-query';
 import { queryClient } from './api/queryClient';
 import { RoomProvider } from './context/RoomContext';
 import {MessageProvider} from './context/MessageContext';
+import { UserProvider } from './context/UserContext.jsx'
 
 createRoot(document.getElementById('root')).render(
     <StrictMode>
@@ -16,9 +17,11 @@ createRoot(document.getElementById('root')).render(
             <Provider store={store}>
                 <AuthProvider>
                     <RoomProvider>
-                        <MessageProvider>
-                            <App />
-                        </MessageProvider>
+                        <UserProvider>
+                            <MessageProvider>
+                                <App />
+                            </MessageProvider>
+                        </UserProvider>
                     </RoomProvider>
                 </AuthProvider>
             </Provider>
