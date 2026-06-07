@@ -12,9 +12,9 @@ export default function MessageList({ currentUser, isOtherTyping }) {
   }, [activeRoom?.messages, isOtherTyping]);
 
   return (
-    <div className="flex-1 overflow-y-auto bg-muted/30 dark:bg-background/50 p-4 sm:p-6 custom-scrollbar transition-colors duration-300">
-      <div className="mx-auto flex max-w-5xl flex-col justify-end min-h-full">
-        {activeRoom?.messages.length === 0 ? (
+    <div className="flex-1 min-h-0 overflow-y-auto bg-muted/30 dark:bg-background/50 p-4 sm:p-6 custom-scrollbar transition-colors duration-300">
+      <div className="mx-auto flex max-w-5xl flex-col gap-2">
+        {activeRoom?.messages?.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full text-center py-20">
             <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
               <span className="text-2xl">👋</span>
@@ -25,14 +25,12 @@ export default function MessageList({ currentUser, isOtherTyping }) {
             </p>
           </div>
         ) : (
-          <div className="flex flex-col space-y-2">
-            {/* Initial Welcome message (simulated) */}
+          <div className="flex flex-col gap-3">
             <div className="my-6 text-center">
               <span className="rounded-full bg-muted px-3 py-1 text-xs font-medium text-muted-foreground border border-border">
                 Today
               </span>
             </div>
-            
             {activeRoom?.messages.map((message, index) => {
               const isOwnMessage = message.userId === user?.id;
               // Check if previous message is from same sender to group them

@@ -7,44 +7,18 @@ import ChannelModal from './components/ChannelModal';
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useAuth } from './hooks/useAuth';
+import { useRooms } from './hooks/useRooms';
 import ProtectedRoute from './components/ProtectedRoute';
-
-const INITIAL_MESSAGES = {
-  general: [
-    {
-      id: '1',
-      text: 'Welcome to the general channel!',
-      sender: 'System',
-      timestamp: Date.now() - 3600000,
-      avatar: 'https://i.pravatar.cc/150?u=system'
-    },
-    {
-      id: '2',
-      text: 'Has anyone seen the new UI designs?',
-      sender: 'Alice',
-      timestamp: Date.now() - 1800000,
-      avatar: 'https://i.pravatar.cc/150?u=1'
-    }
-  ],
-  'react-dev': [
-    {
-      id: '3',
-      text: 'Just upgraded to React 19, looks awesome.',
-      sender: 'Charlie',
-      timestamp: Date.now() - 7200000,
-      avatar: 'https://i.pravatar.cc/150?u=3'
-    }
-  ],
-  'ui-design': []
-};
+import EmptyTab from "./components/EmptyTab";
 
 function App() {
   const { user, logout, loading } = useAuth();
   const username = user?.name ?? user?.email ?? 'User';
   const [currentRoom, setCurrentRoom] = useState('general');
-  const [messages, setMessages] = useState(INITIAL_MESSAGES);
+//   const [messages, setMessages] = useState(INITIAL_MESSAGES);
   const [isTyping, setIsTyping] = useState(false);
   const [otherTyping, setOtherTyping] = useState(false);
+  const {activeRoom} = useRooms();
   
   // Theme state
   const [theme, setTheme] = useState(() => {
@@ -110,7 +84,7 @@ function App() {
     // In a real app, this would emit a socket event
   };
 
-  const currentMessages = messages[currentRoom] || [];
+//   const currentMessages = messages[currentRoom] || [];
 
   return (
     <>
@@ -130,19 +104,26 @@ function App() {
                 </div>
 
                 {/* Main Chat Area */}
-                <div className="flex flex-1 flex-col h-full overflow-hidden relative">
-                    <ChatHeader currentRoom={currentRoom} />
-                    
-                    <MessageList 
-                        messages={currentMessages} 
-                        currentUser={username} 
-                        isOtherTyping={otherTyping}
-                    />
-                    
-                    <MessageInput 
-                        onSendMessage={handleSendMessage} 
-                        onTyping={handleTyping}
-                    />
+                <div className={`flex-1 h-full overflow-hidden relative ${activeRoom ? 'flex flex-col' : ''}`}>
+                    {
+                        activeRoom ? (
+                            <div className="flex h-full flex-col">
+                                <ChatHeader currentRoom={currentRoom} />
+                                
+                                <MessageList 
+                                    currentUser={username} 
+                                    isOtherTyping={otherTyping}
+                                />
+                                
+                                <MessageInput 
+                                    onSendMessage={handleSendMessage} 
+                                    onTyping={handleTyping}
+                                />
+                            </div>
+                        ) : (
+                            <EmptyTab />
+                        )
+                    }
                 </div>
             </div>
             <ChannelModal />

@@ -127,7 +127,12 @@ export default function Sidebar({ username, currentRoom, onLogout, theme, toggle
                 className="group flex w-full items-center gap-3 rounded-lg px-3 py-2 transition-all hover:bg-muted text-left"
               >
                 <div className="relative shrink-0">
-                  <img src={user.avatar} alt={user.name} className="h-7 w-7 rounded-full object-cover" />
+                  { user.avatar ?
+                    <img src={user.avatar} alt={user.name} className="h-7 w-7 rounded-full object-cover" /> :
+                     <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground font-bold shadow-sm">
+                        {user.name.charAt(0).toUpperCase()}
+                    </div>
+                  }
                   <span
                     className={cn(
                       "absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full border-2 border-background",

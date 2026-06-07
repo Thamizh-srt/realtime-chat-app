@@ -1,6 +1,6 @@
 import { cn } from '../lib/utils';
 
-export default function MessageBubble({ message, isOwnMessage, showAvatar = true }) {
+export default function MessageBubble({ message, isOwnMessage, showAvatar = true, user }) {
   return (
     <div
       className={cn(
@@ -18,11 +18,17 @@ export default function MessageBubble({ message, isOwnMessage, showAvatar = true
         <div className="shrink-0 flex flex-col justify-end">
           {showAvatar ? (
             <div className="h-8 w-8 overflow-hidden rounded-full border border-border bg-muted shadow-sm">
-              <img
-                src={message.avatar || `https://i.pravatar.cc/150?u=${message.sender}`}
-                alt={message.sender}
-                className="h-full w-full object-cover"
-              />
+              {
+                message.avatar ? 
+                <img
+                  src={message.avatar || `https://i.pravatar.cc/150?u=${message.sender}`}
+                  alt={message.sender}
+                  className="h-full w-full object-cover"
+                /> : 
+                <div className="flex h-10 shrink-0 text-xl justify-center bg-primary text-primary-foreground font-bold shadow-sm">
+                        {message.user.name.charAt(0).toUpperCase()}
+                </div>
+              }
             </div>
           ) : (
             <div className="h-8 w-8" /> /* Placeholder to keep alignment */

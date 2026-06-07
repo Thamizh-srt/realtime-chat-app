@@ -7,7 +7,8 @@ export const sendMessageToRoom = async (roomId, content, userId) => {
       content,
       userId,
       roomId
-    }
+    },
+    include:{user:{select:{id:true,name:true}}}
   });
   return message;
 };
