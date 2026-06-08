@@ -85,7 +85,8 @@ export const RoomProvider = ({children})=>{
             setActiveRoom(response.data.channel);
             return response.data;
         } catch (error) {
-            console.error('Error fetching room by ID:', error);
+            // console.error('Error fetching room by ID:', error);
+            toast.error(error.response?.data?.error || error.message);
             throw error;
         }
     }

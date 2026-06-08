@@ -44,7 +44,17 @@ export const deleteService = async(id)=>{
     }
 }
 
-export const getchannelById = async(roomId)=>{
+export const getchannelById = async(roomId,userId)=>{
+    const user = await prisma.roomMember.findUnique({
+        where:{
+            roomId_userId: {
+                roomId,
+                userId
+            }
+        }
+    })
+    if(!user) throw new AppError('User is not a member of this channel!',409);
+
     const room = await prisma.room.findUnique({
         where:{id:roomId},
         include:{

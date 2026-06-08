@@ -18,7 +18,7 @@ export const deleteChannel = catchAsync(async(req,res)=>{
 });
 
 export const getSingleChannel = catchAsync(async(req, res)=>{
-    const channel = await getchannelById(req.params.id);
+    const channel = await getchannelById(req.params.id,req.user.id);
     res.status(201).json({channel});
 });
 
