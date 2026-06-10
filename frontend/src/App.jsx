@@ -10,6 +10,7 @@ import { useAuth } from './hooks/useAuth';
 import { useRooms } from './hooks/useRooms';
 import ProtectedRoute from './components/ProtectedRoute';
 import EmptyTab from "./components/EmptyTab";
+import socket from './sockets/socket';
 
 function App() {
   const { user, logout, loading } = useAuth();
@@ -36,6 +37,15 @@ function App() {
     root.classList.remove('light', 'dark');
     root.classList.add(theme);
     localStorage.setItem('theme', theme);
+    socket.on('connect',()=>{
+        console.log('connected:',socket.id);
+    })
+    socket.on("connect_error", (err) => {
+        console.log("Connection Error:", err.message);
+    });
+    return()=>{
+        socket.off('connect');
+    }
   }, [theme]);
 
   const toggleTheme = () => {
