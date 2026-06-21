@@ -32,21 +32,21 @@ function App() {
   });
 
   // Apply theme class to document body
-  useEffect(() => {
-    const root = window.document.documentElement;
-    root.classList.remove('light', 'dark');
-    root.classList.add(theme);
-    localStorage.setItem('theme', theme);
-    socket.on('connect',()=>{
-        console.log('connected:',socket.id);
-    })
-    socket.on("connect_error", (err) => {
-        console.log("Connection Error:", err.message);
-    });
-    return()=>{
-        socket.off('connect');
-    }
-  }, [theme]);
+    useEffect(() => {
+      const root = window.document.documentElement;
+      root.classList.remove('light', 'dark');
+      root.classList.add(theme);
+      localStorage.setItem('theme', theme);
+      socket.on('connect',()=>{
+          console.log('connected:',socket.id);  
+      })
+      socket.on("connect_error", (err) => {
+          console.log("Connection Error:", err.message);
+      });
+      return()=>{
+          socket.off('connect');
+      }
+    }, [theme]);
 
   const toggleTheme = () => {
     setTheme(prev => prev === 'light' ? 'dark' : 'light');

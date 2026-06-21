@@ -5,6 +5,7 @@ export const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
     const [user, setUser] = useState(null);
+    const [accessToken, setaccessToken] = useState(null);
     const [loading, setLoading] = useState(true);
     const [isInitialized, setIsInitialized] = useState(false);
     const [error, setError] = useState(null);
@@ -15,6 +16,7 @@ export function AuthProvider({ children }) {
             setError(null);
             const { data } = await axiosInstance.post('/auth/refresh');
             setAccessToken(data.accessToken);
+            setaccessToken(data.accessToken);
             setUser(data.user);
             setError(null);
         } catch (err) {
@@ -78,6 +80,7 @@ export function AuthProvider({ children }) {
     
     const value = useMemo(() => ({
         user,
+        accessToken,
         loading,
         isInitialized,
         error,

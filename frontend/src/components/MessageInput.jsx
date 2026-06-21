@@ -2,11 +2,17 @@ import { useState, useRef, useEffect } from 'react';
 import { Smile, Paperclip, Send, Mic } from 'lucide-react';
 import { cn } from '../lib/utils';
 import {useMessage} from '../hooks/useMessage';
+import { useSocket } from '../hooks/useSocket';
+import { useRooms } from '../hooks/useRooms';
 
 export default function MessageInput({ onSendMessage, onTyping }) {
-  const [text, setText] = useState('');
-  const inputRef = useRef(null);
-  const { sendMessage } = useMessage();
+    const [text, setText] = useState('');
+    const inputRef = useRef(null);
+    const { sendMessage } = useMessage();
+    const socket = useSocket();
+    const activeRoom = useRooms();
+    const [typing, setTyping] = useState([]);
+
   // Handle typing indicator logic
   useEffect(() => {
     if (text.length > 0) {
@@ -16,27 +22,32 @@ export default function MessageInput({ onSendMessage, onTyping }) {
     } else {
       onTyping(false);
     }
+    socket.on('user_typing', ({ userId, name }) => {
+      setTyping(prev => [...new Set([...prev, name])])
+    })
   }, [text, onTyping]);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (text.trim()) {
-      sendMessage(text.trim());
-      setText('');
-      onTyping(false);
-      // Keep focus on input after sending
-      if (inputRef.current) {
-        inputRef.current.focus();
-      }
-    }
-  };
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        if (text.trim()) {
+        sendMessage(text.trim());
+        setText('');
+        onTyping(false);
+        // Keep focus on input after sending
+        if (inputRef.current) {
+            inputRef.current.focus();
+        }
+        }
+    };
 
-  const handleKeyDown = (e) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      handleSubmit(e);
-    }
-  };
+    const handleKeyDown = (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            handleSubmit(e);
+        }else{
+            socket.emit('typing_start',{roomId:activeRoom.id})
+        }
+    };
 
   return (
     <div className="border-t border-border bg-background p-4 transition-colors duration-300">

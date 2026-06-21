@@ -35,8 +35,8 @@ export const socketAuth = async (socket, next) => {
         
         const payload = verifyRefreshToken(token);
         const user = await prisma.user.findUnique({
-        where: { id: payload.sub },
-        select: { id: true, name: true },
+            where: { id: payload.sub },
+            select: { id: true, name: true },
         });
 
         if (!user) return next(new Error('User not found'));

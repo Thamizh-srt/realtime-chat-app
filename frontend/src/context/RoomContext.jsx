@@ -79,20 +79,8 @@ export const RoomProvider = ({children})=>{
         }
     }
 
-    const getRoomById = async(roomId)=>{
-        try {
-            const response = await axiosInstance.get(`/channel/${roomId}`); 
-            setActiveRoom(response.data.channel);
-            return response.data;
-        } catch (error) {
-            // console.error('Error fetching room by ID:', error);
-            toast.error(error.response?.data?.error || error.message);
-            throw error;
-        }
-    }
-
     return (
-        <RoomContext.Provider value={{user, rooms, activeRoom, fetchRooms, joinRoom, leaveRoom, createRoom, setActiveRoom, deleteChannel, getRoomById }}>
+        <RoomContext.Provider value={{user, rooms, activeRoom, fetchRooms, joinRoom, leaveRoom, createRoom, setActiveRoom, deleteChannel }}>
             {children}
         </RoomContext.Provider>
     )
