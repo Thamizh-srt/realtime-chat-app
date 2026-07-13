@@ -1,7 +1,10 @@
 import { Server } from "socket.io";
 import { socketAuth } from "../middlewares/authMiddleware.js";
-import {saveMessage} from "../services/messageService.js";
-import logger  from "../utils/logger.js";
+import { saveMessage } from "../services/messageService.js";
+import { addOnlineUser, removeOnlineUser } from "../services/presenceService.js";
+import logger from "../utils/logger.js";
+
+const normalizeRoomId = (roomId) => roomId?.trim();
 
 export const initSocket = (httpServer) => {
     const io = new Server(httpServer, {
@@ -12,84 +15,97 @@ export const initSocket = (httpServer) => {
         },
     });
 
-    // ─── Socket auth middleware ──────────────────────────────────
-    // Every socket connection must send a valid JWT
-    // Client: const socket = io(URL, { auth: { token: accessToken } })
     io.use(socketAuth);
 
-  // ─── Connection handler ──────────────────────────────────────
     io.on('connection', (socket) => {
-        logger.info({ userId: socket.user.id, name: socket.user.name }, 'Socket connected');
+        const { user } = socket;
+        const activeSockets = addOnlineUser(user.id);
 
-    // ── join_room ─────────────────────────────────────────────
-    // Client emits: socket.emit('join_room', { roomId })
-    socket.on('join_room', ({ roomId }) => {
-        socket.join(roomId);
-        socket.to(roomId).emit('user_joined', {
-            userId: socket.user.id,
-            name: socket.user.name,
-            roomId,
-            timestamp: new Date().toISOString(),
-        });
-        logger.debug({ userId: socket.user.id, roomId }, 'User joined room');
-    });
+        logger.info({ userId: user.id, name: user.name, activeSockets }, 'Socket connected');
+        io.emit('user_online', { userId: user.id, name: user.name });
 
-    // ── send_message ──────────────────────────────────────────
-    // Client emits: socket.emit('send_message', { roomId, content })
-    socket.on('send_message', async ({ roomId, content }) => {
-        try {
-            if (!content?.trim() || !roomId) return;
+        socket.on('join_room', ({ roomId }) => {
+            const normalizedRoomId = normalizeRoomId(roomId);
+            if (!normalizedRoomId) return;
 
-            const message = await saveMessage({
-                content: content.trim(),
-                userId: socket.user.id,
-                roomId,
+            socket.join(normalizedRoomId);
+            socket.to(normalizedRoomId).emit('user_joined', {
+                userId: user.id,
+                name: user.name,
+                roomId: normalizedRoomId,
+                timestamp: new Date().toISOString(),
             });
+            socket.emit('room_joined', { roomId: normalizedRoomId });
 
-            // Broadcast to everyone in the room (including sender)
-            io.to(roomId).emit('new_message', {
-                id: message.id,
-                content: message.content,
-                roomId,
-                user: message.user,
-                createdAt: message.createdAt,
+            logger.debug({ userId: user.id, roomId: normalizedRoomId }, 'User joined room');
+        });
+
+        socket.on('send_message', async ({ roomId, content }) => {
+            const normalizedRoomId = normalizeRoomId(roomId);
+            const messageContent = content?.trim();
+
+            if (!normalizedRoomId || !messageContent) return;
+
+            try {
+                const message = await saveMessage(normalizedRoomId, messageContent, user.id);
+
+                io.to(normalizedRoomId).emit('new_message', {
+                    id: message.id,
+                    content: message.content,
+                    roomId: normalizedRoomId,
+                    user: message.user,
+                    createdAt: message.createdAt,
+                    userId: message.userId,
+                });
+            } catch (err) {
+                socket.emit('error', {
+                    message: err.message || 'Failed to send message',
+                });
+                logger.error({ err, userId: user.id }, 'Message send error');
+            }
+        });
+
+        socket.on('typing_start', ({ roomId }) => {
+            const normalizedRoomId = normalizeRoomId(roomId);
+            if (!normalizedRoomId) return;
+
+            socket.to(normalizedRoomId).emit('user_typing', {
+                userId: user.id,
+                name: user.name,
+                roomId: normalizedRoomId,
             });
-        } catch (err) {
-            // Send error only to the sender
-            socket.emit('error', { message: err.message });
-            logger.error({ err, userId: socket.user.id }, 'Message send error');
-        }
-    });
+        });
 
-    // ── typing indicators ─────────────────────────────────────
-    socket.on('typing_start', ({ roomId }) => {
-        socket.to(roomId).emit('user_typing', {
-            userId: socket.user.id,
-            name: socket.user.name,
+        socket.on('typing_stop', ({ roomId }) => {
+            const normalizedRoomId = normalizeRoomId(roomId);
+            if (!normalizedRoomId) return;
+
+            socket.to(normalizedRoomId).emit('user_stopped_typing', {
+                userId: user.id,
+                roomId: normalizedRoomId,
+            });
+        });
+
+        socket.on('leave_room', ({ roomId }) => {
+            const normalizedRoomId = normalizeRoomId(roomId);
+            if (!normalizedRoomId) return;
+
+            socket.leave(normalizedRoomId);
+            socket.to(normalizedRoomId).emit('user_left', {
+                userId: user.id,
+                name: user.name,
+                roomId: normalizedRoomId,
+            });
+        });
+
+        socket.on('disconnect', (reason) => {
+            const remaining = removeOnlineUser(user.id);
+            logger.info({ userId: user.id, reason, remaining }, 'Socket disconnected');
+            if (remaining === 0) {
+                io.emit('user_offline', { userId: user.id, name: user.name });
+            }
         });
     });
 
-    socket.on('typing_stop', ({ roomId }) => {
-        socket.to(roomId).emit('user_stopped_typing', {
-            userId: socket.user.id,
-        });
-    });
-
-    // ── leave_room ────────────────────────────────────────────
-    socket.on('leave_room', ({ roomId }) => {
-        socket.leave(roomId);
-        socket.to(roomId).emit('user_left', {
-            userId: socket.user.id,
-            name: socket.user.name,
-            roomId,
-        });
-    });
-
-    // ── disconnect ────────────────────────────────────────────
-    socket.on('disconnect', () => {
-      logger.info({ userId: socket.user.id }, 'Socket disconnected');
-    });
-  });
-
-  return io;
+    return io;
 };

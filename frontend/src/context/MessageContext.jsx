@@ -1,25 +1,17 @@
-import {createContext, useState} from 'react';
-import { useRooms } from '../hooks/useRooms';
-import { useAuth } from '../hooks/useAuth';
-import axiosInstance from '../api/axiosInstance';
+import { createContext, useMemo, useState } from 'react';
 
 export const MessageContext = createContext(null);
 
-export const MessageProvider = ({children})=>{
-    const { activeRoom, setActiveRoom } = useRooms();
-    const { user } = useAuth();
-    const {messages, setMessage } = useState([]);
+export const MessageProvider = ({ children }) => {
+    const [messages, setMessages] = useState([]);
 
-    const sendMessage = async(content)=>{
-        const response = await axiosInstance.post(`/messages/post/${activeRoom.id}`, { content, sender: user.id });
-        setActiveRoom(prev=>({
-            ...prev,
-            messages:[...prev.messages, response.data.message]
-        }));
-        // return response.data;
-    };
-    return (  
-        <MessageContext.Provider value={{ messages, sendMessage }}>
+    const value = useMemo(() => ({
+        messages,
+        setMessages,
+    }), [messages]);
+
+    return (
+        <MessageContext.Provider value={value}>
             {children}
         </MessageContext.Provider>
     );

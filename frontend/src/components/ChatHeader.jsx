@@ -2,7 +2,7 @@ import { Hash, Phone, Video, Info, Search, MoreVertical } from 'lucide-react';
 import {useRooms} from '../hooks/useRooms';
 
 export default function ChatHeader() {
-    const { activeRoom } = useRooms();
+    const { rooms,activeRoom } = useRooms();
 
   return (
     <div className="sticky top-0 z-10 flex h-16 shrink-0 items-center justify-between border-b border-border bg-background/95 px-6 backdrop-blur supports-[backdrop-filter]:bg-background/60 transition-colors duration-300">
@@ -15,7 +15,7 @@ export default function ChatHeader() {
             {activeRoom?.name ?? 'Select a channel'}
           </h2>
           <span className="text-xs text-muted-foreground">
-            {activeRoom?._count?.members ?? 0} members · 2 online
+            {rooms?._count?.members ?? 0} members · 2 online
           </span>
         </div>
       </div>

@@ -72,7 +72,7 @@ export default function Sidebar({ username, currentRoom, onLogout, theme, toggle
           <div className="space-y-2">
             {rooms && rooms.map((channel) => (
               <div key={channel.id} className="group flex items-center justify-between rounded-lg px-3 py-1 transition-all hover:bg-muted">              
-                <button onClick={() => setActiveRoom(channel.id)}
+                <button onClick={() => setActiveRoom(channel)}
                   className={cn(
                     "flex min-w-0 flex-1 items-center gap-2 text-sm font-medium text-left cursor-pointer",
                     currentRoom === channel.id

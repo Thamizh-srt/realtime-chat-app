@@ -1,20 +1,27 @@
-import dotenv  from "dotenv";
+import dotenv from 'dotenv';
 dotenv.config();
-import {createServer} from "http";
-import app from "./server.js";
-import { initSocket } from "./sockets/index.js";
+import { createServer } from 'http';
+import app from './server.js';
+import { initSocket } from './sockets/index.js';
+import logger from './utils/logger.js';
+
 const server = createServer(app);
 
 initSocket(server);
 
-server.listen(process.env.PORT || 5000, () => {
-    console.log(`Server is running on port ${process.env.PORT || 5000}`);
+const port = process.env.PORT || 5000;
+
+server.listen(port, () => {
+    console.log(`Server is running on port ${port}`);
 });
 
-process.on('SIGTERM', () => {
-  logger.info('SIGTERM received — shutting down gracefully');
-  httpServer.close(() => {
-    logger.info('Server closed');
-    process.exit(0);
-  });
-});
+const shutdown = () => {
+    logger.info('Shutdown signal received — closing server gracefully');
+    server.close(() => {
+        logger.info('Server closed');
+        process.exit(0);
+    });
+};
+
+process.on('SIGTERM', shutdown);
+process.on('SIGINT', shutdown);
