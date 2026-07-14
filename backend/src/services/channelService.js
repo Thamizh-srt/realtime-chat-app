@@ -28,8 +28,13 @@ export const createService = async({name,id}, userId)=>{
 
 export const listService = async()=>{
     const channels = await prisma.room.findMany({
-        select: { id: true, name: true, createdAt: true }
-    })
+        select: {
+            id: true,
+            name: true,
+            createdAt: true,
+            _count: { select: { members: true } },
+        },
+    });
     return channels;
 }
 

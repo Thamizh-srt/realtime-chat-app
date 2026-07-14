@@ -14,10 +14,10 @@ import { useUsers } from '../hooks/useUsers';
 //   { id: '3', name: 'Charlie', status: 'online', avatar: 'https://i.pravatar.cc/150?u=3' },
 // ];
 
-export default function Sidebar({ username, currentRoom, onLogout, theme, toggleTheme }) {
+export default function Sidebar({ username, currentRoom, onLogout, theme, toggleTheme, onRoomChange }) {
     const dispatch = useDispatch();
     const [openId, setOpenId] = useState(null);
-    const {rooms, deleteChannel,joinRoom,leaveRoom, setActiveRoom } = useRooms();
+    const { rooms, deleteChannel, joinRoom, leaveRoom, selectRoom } = useRooms();
     const { users } = useUsers();
     const handleClickOutside = () => {
         setOpenId(null);
@@ -72,7 +72,10 @@ export default function Sidebar({ username, currentRoom, onLogout, theme, toggle
           <div className="space-y-2">
             {rooms && rooms.map((channel) => (
               <div key={channel.id} className="group flex items-center justify-between rounded-lg px-3 py-1 transition-all hover:bg-muted">              
-                <button onClick={() => setActiveRoom(channel)}
+                <button onClick={() => {
+                    selectRoom(channel);
+                    onRoomChange?.(channel.id);
+                }}
                   className={cn(
                     "flex min-w-0 flex-1 items-center gap-2 text-sm font-medium text-left cursor-pointer",
                     currentRoom === channel.id

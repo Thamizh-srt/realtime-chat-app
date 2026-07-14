@@ -27,7 +27,6 @@ export default function MessageList() {
     const loadMessages = async () => {
       try {
         const response = await getMessages(activeRoom.id);
-        debugger
         if (!isCancelled) {
           setMessages(response.channel?.messages || []);
         }

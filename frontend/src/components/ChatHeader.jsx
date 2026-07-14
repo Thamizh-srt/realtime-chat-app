@@ -1,8 +1,18 @@
 import { Hash, Phone, Video, Info, Search, MoreVertical } from 'lucide-react';
-import {useRooms} from '../hooks/useRooms';
+import { useRooms } from '../hooks/useRooms';
+import { useUsers } from '../hooks/useUsers';
 
 export default function ChatHeader() {
-    const { rooms,activeRoom } = useRooms();
+    const { activeRoom } = useRooms();
+    const { users } = useUsers();
+
+    const totalMembers = activeRoom?._count?.members ?? activeRoom?.members?.length ?? 0;
+    const onlineMembers = activeRoom?.members
+        ? activeRoom.members.filter((member) => {
+            const userStatus = users.find((user) => user.id === member.user.id)?.status;
+            return userStatus === 'online';
+        }).length
+        : 0;
 
   return (
     <div className="sticky top-0 z-10 flex h-16 shrink-0 items-center justify-between border-b border-border bg-background/95 px-6 backdrop-blur supports-[backdrop-filter]:bg-background/60 transition-colors duration-300">
@@ -15,7 +25,7 @@ export default function ChatHeader() {
             {activeRoom?.name ?? 'Select a channel'}
           </h2>
           <span className="text-xs text-muted-foreground">
-            {rooms?._count?.members ?? 0} members · 2 online
+            {totalMembers} member{totalMembers === 1 ? '' : 's'} · {onlineMembers} online
           </span>
         </div>
       </div>

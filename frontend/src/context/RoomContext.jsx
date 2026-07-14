@@ -12,6 +12,7 @@ export const RoomProvider = ({children})=>{
     const [activeRoom, setActiveRoom] = useState(null);
     const [loading,setLoading] = useState(false);
     const { user, isInitialized } = useAuth();
+
     const dispatch = useDispatch();
 
     useEffect(() => {
@@ -33,6 +34,37 @@ export const RoomProvider = ({children})=>{
             setLoading(false);
         }
     }, []);
+
+    const fetchRoomById = useCallback(async (roomId) => {
+        try {
+            const response = await axiosInstance.get(`/channel/${roomId}`);
+            return response.data.channel;
+        } catch (error) {
+            console.error('Error fetching room details:', error);
+            throw error;
+        }
+    }, []);
+
+    const selectRoom = async (room) => {
+        if (!room) {
+            setActiveRoom(null);
+            return null;
+        }
+
+        if (room.members && room._count) {
+            setActiveRoom(room);
+            return room;
+        }
+
+        try {
+            const detailedRoom = await fetchRoomById(room.id);
+            setActiveRoom(detailedRoom);
+            return detailedRoom;
+        } catch (error) {
+            setActiveRoom(room);
+            return room;
+        }
+    };
 
     const deleteChannel = async(id)=>{
         try {                   
@@ -80,7 +112,19 @@ export const RoomProvider = ({children})=>{
     }
 
     return (
-        <RoomContext.Provider value={{user, rooms, activeRoom, fetchRooms, joinRoom, leaveRoom, createRoom, setActiveRoom, deleteChannel }}>
+        <RoomContext.Provider value={{
+            user,
+            rooms,
+            activeRoom,
+            fetchRooms,
+            fetchRoomById,
+            selectRoom,
+            joinRoom,
+            leaveRoom,
+            createRoom,
+            setActiveRoom,
+            deleteChannel,
+        }}>
             {children}
         </RoomContext.Provider>
     )
